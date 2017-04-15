@@ -70,5 +70,11 @@ bower_components
 .sass-cache/
 *.css.maps
 
+### Angular compile ##
+# compiled output
+/dist
+/tmp
+/out-tsc
+
 
 # End of https://www.gitignore.io/api/node
