@@ -1,0 +1,10 @@
+{
+  "name": "example",
+  "description": "a Sails application",
+  "main": "app.js",
+  "authors": [
+    "Pablo"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/pablocordoba11/Example"
+}
