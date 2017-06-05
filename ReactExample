@@ -1,0 +1,198 @@
+import React from 'react';
+import AppBar from '../appBar.js';
+import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
+import AddFloatButton from '../addFloatButton.js'
+import EditFloatButton from '../editFloatButton.js'
+import DeleteFloatButton from '../deleteFloatButton.js'
+import { Link } from 'react-router-dom';
+import TextField from 'material-ui/TextField';
+import { getPacientes } from '../../actions/pacienteActions.js';
+import { connect } from 'react-redux';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
+import Snackbar from 'material-ui/Snackbar';
+
+@connect((store) => {
+  console.log(store)
+  return {
+    pacientes:store.pacienteReducer.pacientes
+  };
+})
+
+export default class Cliente extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+     fixedHeader: true,
+     stripedRows: false,
+     showRowHover: false,
+     selectable: true,
+     multiSelectable: false,
+     enableSelectAll: false,
+     deselectOnClickaway: true,
+     showCheckboxes: true,
+     height: '100%',
+     width: '100%',
+     selectedItem : null,
+     selected : false,
+     showDeletePopUp: false,
+     showSnackBar: false
+   };
+   this.handleFilterGrid = this.handleFilterGrid.bind(this)
+   this.selectField = this.selectField.bind(this)
+   this.componentWillMount = this.componentWillMount.bind(this)
+   this.getPacientes = this.getPacientes.bind(this)
+   this.handleLinks = this.handleLinks.bind(this)
+   this.handleOpenDeletePopUp = this.handleOpenDeletePopUp.bind(this)
+   this.handleClosePopUp = this.handleClosePopUp.bind(this)
+   this.deletePaciente = this.deletePaciente.bind(this)
+
+
+ }
+   componentWillMount() {
+     this.props.dispatch(getPacientes())
+   }
+   getPacientes(){
+      this.props.dispatch(getPacientes())
+   }
+   handleFilterGrid(e) {
+     var inputValue = e.target.value;
+       this.state.date = this.props.pacientes.filter(function(v){
+          if(v.nombre.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
+             || v.apellido.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1){
+            v.hidden = false;
+          }else{
+            v.hidden = true;
+          }
+       });
+     this.forceUpdate();
+   }
+   selectField(row){
+     /* Recive el Index de la row*/
+     /*._id is the id from mongo */
+     if(row.length > 0){
+       this.state.selected = true;
+       this.state.selectedItem = this.props.pacientes[row];
+     }else{
+       this.state.selected = false;
+       this.state.selectedItem = null;
+     }
+     this.forceUpdate();
+   }
+   handleOpenDeletePopUp(){
+     this.state.showDeletePopUp = true;
+     this.forceUpdate();
+   }
+   handleClosePopUp(){
+     this.state.showDeletePopUp = false;
+     this.forceUpdate();
+   }
+   deletePaciente(pacienteId){
+     if(pacienteId){
+       console.log("here call the api to delete paciente");
+       console.log("show the popOver with the result");
+       /*this.handleClosePopUp();
+       this.state.showSnackBar = true;*/
+
+     }
+   }
+   handleLinks(e){
+     console.log(e)
+      this.context.router.push('/addPaciente')
+   }
+  render(){
+      const { pacientes } = this.props;
+      const deleteActions = [
+         <FlatButton
+           label="Aceptar"
+           primary={true}
+           onTouchTap={this.deletePaciente(this.state.selectedItem )}
+         />,
+         <FlatButton
+           label="Cancelar"
+           primary={true}
+           onTouchTap={this.handleClosePopUp}
+         />,
+       ];
+    return(
+      <div>
+        <AppBar/>
+        <div>
+          <Table
+                height={this.state.height}
+                width={this.state.with}
+                fixedHeader={this.state.fixedHeader}
+                selectable={this.state.selectable}
+                multiSelectable={this.state.multiSelectable}
+                onRowSelection={this.selectField}>
+            <TableHeader
+                displaySelectAll={this.state.showCheckboxes}
+                adjustForCheckbox={this.state.showCheckboxes}
+                enableSelectAll={this.state.enableSelectAll}>
+                 <TableRow id="filtersRow">
+                    <TableHeaderColumn style={{textAlign: 'left'}}>
+                          <h3>PACIENTES</h3>
+                    </TableHeaderColumn>
+                    <TableHeaderColumn colSpan="6" style={{textAlign: 'right'}}><TextField
+                          onChange={this.handleFilterGrid} hintText="Filtro"/>
+                    </TableHeaderColumn>
+                  </TableRow>
+                  <TableRow>
+                      <TableHeaderColumn tooltip='Nombre'>Nombre</TableHeaderColumn>
+                      <TableHeaderColumn tooltip='Apellido'>Apellido</TableHeaderColumn>
+                      <TableHeaderColumn tooltip='Correo Electonico'>E-mail</TableHeaderColumn>
+                      <TableHeaderColumn tooltip='Celular'>Telefono</TableHeaderColumn>
+                      <TableHeaderColumn tooltip='Fecha Nacimiento'>Fecha Nacimiento</TableHeaderColumn>
+                      <TableHeaderColumn tooltip='Sexo'>Sexo</TableHeaderColumn>
+                      <TableHeaderColumn tooltip='Antiguedad'>Registrada</TableHeaderColumn>
+                  </TableRow>
+            </TableHeader>
+
+            <TableBody
+                displayRowCheckbox={this.state.showCheckboxes}
+                deselectOnClickaway={this.state.deselectOnClickaway}
+                showRowHover={this.state.showRowHover}
+                stripedRows={this.state.stripedRows}>
+                {pacientes.map( (row, index) => (
+                    row.hidden ? null : (
+                      <TableRow key={index} selected={row.selected}>
+                        <TableRowColumn>{row.nombre}</TableRowColumn>
+                        <TableRowColumn>{row.apellido}</TableRowColumn>
+                        <TableRowColumn>{row.email}</TableRowColumn>
+                        <TableRowColumn>{row.telefono}</TableRowColumn>
+                        <TableRowColumn>{row.fNacimiento}</TableRowColumn>
+                        <TableRowColumn>{row.sexo}</TableRowColumn>
+                        <TableRowColumn>{row.createdAt}</TableRowColumn>
+                      </TableRow>
+                    )
+
+                 ))}
+            </TableBody>
+          </Table>
+          {this.state.selected ?(
+            <div>
+              <Link to="/updatePaciente" ><EditFloatButton /></Link>
+              <DeleteFloatButton onClick={this.handleOpenDeletePopUp} />
+            </div>
+            )
+            :<Link to="/addPaciente"><AddFloatButton /></Link>
+          }
+          <div id="alertas">
+            <Dialog
+              actions={deleteActions}
+              modal={false}
+              open={this.state.showDeletePopUp}
+              onRequestClose={this.handleClosePopUp}>
+              Esta seguro que desea eliminar el Paciente selecionado?
+            </Dialog>
+            <Snackbar
+              open={this.state.showSnackBar}
+              message="Paciente elminado"
+              autoHideDuration={3000}
+            />
+          </div>
+          </div>
+        </div>
+    )
+  }
+}
