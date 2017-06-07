@@ -57,43 +57,41 @@ export default class Cliente extends React.Component {
    }
    handleFilterGrid(e) {
      var inputValue = e.target.value;
-       this.state.date = this.props.pacientes.filter(function(v){
+     this.setState({
+       date: this.props.pacientes.filter(function(v){
           if(v.nombre.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1
              || v.apellido.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1){
             v.hidden = false;
           }else{
             v.hidden = true;
           }
-       });
-     this.forceUpdate();
+       })
+     })
    }
    selectField(row){
      /* Recive el Index de la row*/
      /*._id is the id from mongo */
      if(row.length > 0){
-       this.state.selected = true;
-       this.state.selectedItem = this.props.pacientes[row];
+       this.setState({selected: true})
+       this.setState({selectedItem: this.props.pacientes[row]})
      }else{
-       this.state.selected = false;
-       this.state.selectedItem = null;
+       this.setState({selected: false})
+       this.setState({selectedItem: null})
      }
      this.forceUpdate();
    }
    handleOpenDeletePopUp(){
-     this.state.showDeletePopUp = true;
-     this.forceUpdate();
+     this.setState({showDeletePopUp: true})
    }
    handleClosePopUp(){
-     this.state.showDeletePopUp = false;
-     this.forceUpdate();
+     this.setState({showDeletePopUp: false})
    }
    deletePaciente(pacienteId){
      if(pacienteId){
-       console.log("here call the api to delete paciente");
-       console.log("show the popOver with the result");
+       console.log('here call the api to delete paciente');
+       console.log('show the popOver with the result');
        /*this.handleClosePopUp();
        this.state.showSnackBar = true;*/
-
      }
    }
    handleLinks(e){
@@ -104,12 +102,12 @@ export default class Cliente extends React.Component {
       const { pacientes } = this.props;
       const deleteActions = [
          <FlatButton
-           label="Aceptar"
+           label='Aceptar'
            primary={true}
-           onTouchTap={this.deletePaciente(this.state.selectedItem )}
+           onTouchTap={this.deletePaciente}
          />,
          <FlatButton
-           label="Cancelar"
+           label='Cancelar'
            primary={true}
            onTouchTap={this.handleClosePopUp}
          />,
@@ -129,12 +127,12 @@ export default class Cliente extends React.Component {
                 displaySelectAll={this.state.showCheckboxes}
                 adjustForCheckbox={this.state.showCheckboxes}
                 enableSelectAll={this.state.enableSelectAll}>
-                 <TableRow id="filtersRow">
+                 <TableRow id='filtersRow'>
                     <TableHeaderColumn style={{textAlign: 'left'}}>
                           <h3>PACIENTES</h3>
                     </TableHeaderColumn>
-                    <TableHeaderColumn colSpan="6" style={{textAlign: 'right'}}><TextField
-                          onChange={this.handleFilterGrid} hintText="Filtro"/>
+                    <TableHeaderColumn colSpan='6' style={{textAlign: 'right'}}><TextField
+                          onChange={this.handleFilterGrid} hintText='Filtro'/>
                     </TableHeaderColumn>
                   </TableRow>
                   <TableRow>
@@ -171,13 +169,13 @@ export default class Cliente extends React.Component {
           </Table>
           {this.state.selected ?(
             <div>
-              <Link to="/updatePaciente" ><EditFloatButton /></Link>
+              <Link to='/updatePaciente' ><EditFloatButton /></Link>
               <DeleteFloatButton onClick={this.handleOpenDeletePopUp} />
             </div>
             )
-            :<Link to="/addPaciente"><AddFloatButton /></Link>
+            :<Link to='/addPaciente'><AddFloatButton /></Link>
           }
-          <div id="alertas">
+          <div id='alertas'>
             <Dialog
               actions={deleteActions}
               modal={false}
@@ -187,7 +185,7 @@ export default class Cliente extends React.Component {
             </Dialog>
             <Snackbar
               open={this.state.showSnackBar}
-              message="Paciente elminado"
+              message='Paciente elminado'
               autoHideDuration={3000}
             />
           </div>
